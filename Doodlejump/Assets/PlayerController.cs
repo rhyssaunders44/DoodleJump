@@ -7,34 +7,52 @@ public class PlayerController : MonoBehaviour
     public Collider2D playerCollider;
     public Rigidbody2D PlayerRigid;
     public  static bool goingUp;
-    public float currentY;
+    public static float currentY;
     public GameObject Platform;
+    [SerializeField] private GameObject deathfloor;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private float yPos;
+    [SerializeField] private ParticleSystem deathSplosion;
+    [SerializeField] private bool dead;
+    [SerializeField] private SpriteRenderer SpriteRenderer;
 
     public delegate void OnPlayerCollisionEnter(Collision2D collision);
-    public event OnPlayerCollisionEnter onPlayerCollisionEnter;
 
     public void Update()
     {
         TakePosition();
         SetPosition();
 
-        if (goingUp == true)
+        if (goingUp)
         {
             Physics2D.IgnoreLayerCollision(0, 3, ignore:true);
+            yPos = currentY - 10;
         }
-        else
+        
+        if(!goingUp)
         {
-            Physics2D.IgnoreLayerCollision(0, 3, ignore:false);
+            Physics2D.IgnoreLayerCollision(0, 3, ignore: false);
+            yPos = deathfloor.transform.position.y;
         }
+
+        if (!dead)
+        {
+            deathfloor.transform.position = new Vector3(playerCollider.transform.position.x, yPos);
+            mainCamera.transform.position = new Vector3(playerCollider.transform.position.x, playerCollider.transform.position.y, -10);
+        }
+
 
         if (Input.GetKey(KeyCode.D))
         {
             PlayerRigid.AddForce(Vector2.right);
+            SpriteRenderer.flipX = true;
+
         }
 
         if (Input.GetKey(KeyCode.A))
         {
             PlayerRigid.AddForce(Vector2.left);
+            SpriteRenderer.flipX = false;
         }
     }
 
@@ -43,8 +61,14 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "Platform" && goingUp == false)
         {
             PlayerRigid.AddForce(Vector3.up * 10, ForceMode2D.Impulse);
+            SpawnManager.collision = true;
         }
-        onPlayerCollisionEnter.Invoke(collision);
+
+        if (collision.gameObject.tag == "DED")
+        {
+            dead = true;
+            GameOver();
+        }
     }
 
     public bool TakePosition()
@@ -64,6 +88,12 @@ public class PlayerController : MonoBehaviour
     public void SetPosition()
     {
         currentY = PlayerRigid.position.y;
+    }
+
+    public void GameOver()
+    {
+        deathSplosion.gameObject.SetActive(true);
+        Destroy(this.gameObject);
     }
 
 }

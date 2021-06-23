@@ -5,28 +5,23 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     public GameObject Player;
-    private PlayerController playerController;
     public GameObject Platform;
-
-    int platformNumber;
-    public float newPlatform;
+    public float newPlatformPos;
+    public static bool collision;
     float randomX;
     float randomY;
 
-    public void Start()
+    private void Start()
     {
-        newPlatform = Player.transform.position.y - 10;
+        newPlatformPos = Player.transform.position.y - 10;
     }
 
-    private void OnEnable()
+    private void Update()
     {
-        playerController = Player.GetComponent<PlayerController>();
-        playerController.onPlayerCollisionEnter += example;
-    }
-
-    private void OnDisable()
-    {
-        playerController.onPlayerCollisionEnter -= example;
+        if (collision)
+        {
+            Collide();
+        }
     }
 
     public float GenerateX()
@@ -41,19 +36,21 @@ public class SpawnManager : MonoBehaviour
         return randomY;
     }
 
-    public void SpawnPlatform(int spawnPlatform)
+    public void SpawnPlatform()
     {
-        Instantiate(Platform, new Vector2(GenerateX(), GenerateY()), Quaternion.identity); 
+        Instantiate(Platform, new Vector2(GenerateX(), GenerateY()), Quaternion.identity);
     }
 
-    public void example(Collision2D collision)
+    public void Collide()
     {
-        if (collision.gameObject.tag == "Platform" && newPlatform != Player.transform.position.y)
+        if (Mathf.Abs(newPlatformPos - Player.transform.position.y) > 2)
         {
-            platformNumber = Random.Range(1, 3);
-            SpawnPlatform(platformNumber);
-            newPlatform = Player.transform.position.y;
+            UiManager.Score++;
+            SpawnPlatform();
+            newPlatformPos = Player.transform.position.y;
+
         }
+        collision = false;
     }
 
 }

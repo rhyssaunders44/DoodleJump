@@ -12,7 +12,7 @@ public class DestroyManager : MonoBehaviour
     }
     void Update()
     {
-        if (transform.position.y <= Player.transform.position.y - 10)
+        if (transform.position.y <= PlayerController.currentY - 10)
         {
             Destroy(this.gameObject);
         }
