@@ -6,10 +6,6 @@ public class DestroyManager : MonoBehaviour
 {
     public GameObject Player;
 
-    public void Start()
-    {
-        
-    }
     void Update()
     {
         if (transform.position.y <= PlayerController.currentY - 10)

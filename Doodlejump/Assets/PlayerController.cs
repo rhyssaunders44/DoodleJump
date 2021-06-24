@@ -12,11 +12,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject deathfloor;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float yPos;
-    [SerializeField] private ParticleSystem deathSplosion;
+
     [SerializeField] private bool dead;
     [SerializeField] private SpriteRenderer SpriteRenderer;
+    public static bool paused;
+    [SerializeField] private GameObject PauseMenu;
 
-    public delegate void OnPlayerCollisionEnter(Collision2D collision);
 
     public void Update()
     {
@@ -41,20 +42,38 @@ public class PlayerController : MonoBehaviour
             mainCamera.transform.position = new Vector3(playerCollider.transform.position.x, playerCollider.transform.position.y, -10);
         }
 
-
-        if (Input.GetKey(KeyCode.D))
+        if (!paused)
         {
-            PlayerRigid.AddForce(Vector2.right);
-            SpriteRenderer.flipX = true;
-
-        }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            PlayerRigid.AddForce(Vector2.left);
-            SpriteRenderer.flipX = false;
+           
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Pause(paused);
+            }
         }
     }
+
+    private void FixedUpdate()
+    {
+        if (!paused)
+        {
+            if (Input.GetKey(KeyCode.D))
+            {
+                Move(Vector2.right, true);
+            }
+
+            if (Input.GetKey(KeyCode.A))
+            {
+                Move(Vector2.left, false);
+            }
+        }
+    }
+
+    private void Move(Vector2 moveDirection , bool flip)
+    {
+        PlayerRigid.AddForce(moveDirection * 10, ForceMode2D.Force);
+        SpriteRenderer.flipX = flip;
+    }
+
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
@@ -66,8 +85,7 @@ public class PlayerController : MonoBehaviour
 
         if (collision.gameObject.tag == "DED")
         {
-            dead = true;
-            GameOver();
+            UiManager.dead = true;
         }
     }
 
@@ -90,10 +108,19 @@ public class PlayerController : MonoBehaviour
         currentY = PlayerRigid.position.y;
     }
 
-    public void GameOver()
+    public void Pause(bool pause)
     {
-        deathSplosion.gameObject.SetActive(true);
-        Destroy(this.gameObject);
-    }
+        if (!pause)
+        {
+            Time.timeScale = 0;
+            PauseMenu.SetActive(true);
+        }
 
+        if (pause)
+        {
+            Time.timeScale = 1;
+            PauseMenu.SetActive(false);
+        }
+
+    }
 }
