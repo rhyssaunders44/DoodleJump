@@ -20,7 +20,6 @@ public class SaveLoad : MonoBehaviour
         }
     }
 
-
     public void SaveGame(GameData saveData)
     {
         FileStream dataStream = new FileStream(filePath, FileMode.Create);

@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool dead;
     [SerializeField] private SpriteRenderer SpriteRenderer;
     public static bool paused;
-    [SerializeField] private GameObject PauseMenu;
 
 
     public void Update()
@@ -40,15 +39,6 @@ public class PlayerController : MonoBehaviour
         {
             deathfloor.transform.position = new Vector3(playerCollider.transform.position.x, yPos);
             mainCamera.transform.position = new Vector3(playerCollider.transform.position.x, playerCollider.transform.position.y, -10);
-        }
-
-        if (!paused)
-        {
-           
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Pause(paused);
-            }
         }
     }
 
@@ -106,21 +96,5 @@ public class PlayerController : MonoBehaviour
     public void SetPosition()
     {
         currentY = PlayerRigid.position.y;
-    }
-
-    public void Pause(bool pause)
-    {
-        if (!pause)
-        {
-            Time.timeScale = 0;
-            PauseMenu.SetActive(true);
-        }
-
-        if (pause)
-        {
-            Time.timeScale = 1;
-            PauseMenu.SetActive(false);
-        }
-
     }
 }

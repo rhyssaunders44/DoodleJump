@@ -20,36 +20,52 @@ public class UiManager : MonoBehaviour
     [SerializeField] private Text StartHSName;
     [SerializeField] private Text StartHS;
     public static string playerName;
+    [SerializeField] private bool inStart;
+    [SerializeField] private GameObject PauseMenu;
+    [SerializeField] private GameObject PauseButton;
 
 
     private void Start()
     {
         Score = 0;
-        PlayerController.paused = true;
+        PlayerController.paused = false;
         Time.timeScale = 0;
-        if(GameData.highScoreName != null)
-        {
-            StartHSName.text = GameData.highScoreName;
-            StartHS.text = GameData.score.ToString();
-        }
-        else
-        {
-            StartHSName.text = "";
-            StartHS.text = " No High Score";
-        }
+        inStart = true;
+
     }
 
     private void Update()
     {
-        scoreText.text = "Score: " + Score.ToString();
+        if (inStart)
+        {
+            if (DM.availableScore != 0)
+            {
+                if (DM.topDuckName != null)
+                {
+                    StartHSName.text = DM.topDuckName;
+                }
+                else
+                {
+                    StartHSName.text = "Unnamed Duck";
+                }
 
+                StartHS.text = DM.availableScore.ToString();
+            }
+            else
+            {
+                StartHSName.text = "";
+                StartHS.text = " No High Score";
+            }
+        }
+
+        scoreText.text = "Score: " + Score.ToString();
 
         if (dead)
         {
-            if (Score >= GameData.score)
+            if (Score >= DM.availableScore)
             {
                 endGameScreen.SetActive(true);
-                GameData.HighScoreFinalise();
+                DM.newHighScore = true;
                 GameOver();
             }
             else
@@ -64,7 +80,26 @@ public class UiManager : MonoBehaviour
     {
         PlayerController.paused = false;
         Time.timeScale = 1;
+        inStart = false;
         enterNameField.SetActive(false);
+        PauseButton.SetActive(true);
+    }
+
+    public void Pause(bool pause)
+    {
+        if (pause)
+        {
+            Time.timeScale = 0;
+            PlayerController.paused = true;
+            PauseMenu.SetActive(true);
+        }
+
+        if (!pause)
+        {
+            Time.timeScale = 1;
+            PlayerController.paused = false;
+            PauseMenu.SetActive(false);
+        }
     }
 
     public void SaveName()
@@ -79,13 +114,13 @@ public class UiManager : MonoBehaviour
         Player.SetActive(false);
         distanceTravelled = Player.transform.position.y;
 
-        if (GameData.highScoreName == null)
+        if (DM.topDuckName == null)
         {
-            GameData.highScoreName = "Unnamed Duck";
+            DM.topDuckName = "Unnamed Duck";
         }
 
-        if (GameData.score != 0)
-            highScore.text = GameData.highScoreName + ": " + GameData.score.ToString() + " / Distance flown: " + Mathf.Round(GameData.maxHeight);
+        if (DM.availableScore != 0)
+            highScore.text = DM.topDuckName + ": " + DM.availableScore.ToString() + " / Distance flown: " + Mathf.Round(DM.topHeight);
         else
             highScore.text = "No High Score";
 

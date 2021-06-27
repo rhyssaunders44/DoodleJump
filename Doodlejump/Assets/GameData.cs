@@ -5,11 +5,11 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
-    public static int score = 0;
-    public static string highScoreName;
-    public static float maxHeight;
+    public int score;
+    public string highScoreName;
+    public float maxHeight;
 
-    public static void HighScoreFinalise()
+    public void HighScoreFinalise()
     {
         score = UiManager.Score;
         highScoreName = UiManager.playerName;
@@ -17,11 +17,6 @@ public class GameData
     }
 
 
+   
 
-    public void ResetData()
-    {
-        score = 0;
-        highScoreName = null;
-        maxHeight = 0;
-    }
 }
